@@ -17,8 +17,10 @@ main {
   width: auto;
   height: auto;
   padding: 5px;
-  font: 12px sans-serif;
-  background: grey;
+  text-align: center;
+  font: 15px sans-serif;
+  color: white;
+  background: black;
   border: 0px;
   border-radius: 8px;
   pointer-events: none;

@@ -56,8 +56,6 @@ request.onload = () => {
     "#bc0000"
   ];
 
-  console.log(0 < 2.8);
-
   const getColor = temp => {
     let color = "";
     if (temp < 2.8) {
@@ -86,22 +84,11 @@ request.onload = () => {
     return color;
   };
 
-  console.log(getColor(baseTemp + data[20].variance));
-
   // define x and y scales
   const xScale = d3
     .scaleTime()
     .domain([d3.min(data, d => d.parsedYear), d3.max(data, d => d.parsedYear)])
     .range([0, w]);
-
-  // const yScale = d3
-  //   .scaleOrdinal()
-  //   .domain(months)
-  //   .range(
-  //     months.map((month, index) => {
-  //       return h - (h / months.length) * index;
-  //     })
-  //   );
 
   const yScale = d3
     .scaleBand()
@@ -143,26 +130,6 @@ request.onload = () => {
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-  // // Three function that change the tooltip when user hover / move / leave a cell
-  // var mouseover = function(d) {
-  //   tooltip.style("opacity", 1);
-  //   d3.select(this)
-  //     .style("stroke", "black")
-  //     .style("opacity", 1);
-  // };
-  // var mousemove = function(d) {
-  //   tooltip
-  //     .html("The exact value of<br>this cell is: " + d.value)
-  //     .style("left", d3.mouse(this)[0] + 70 + "px")
-  //     .style("top", d3.mouse(this)[1] + "px");
-  // };
-  // var mouseleave = function(d) {
-  //   tooltip.style("opacity", 0);
-  //   d3.select(this)
-  //     .style("stroke", "none")
-  //     .style("opacity", 0.8);
-  // };
-
   // add the squares
   svg
     .selectAll("rect")
@@ -186,20 +153,24 @@ request.onload = () => {
     .style("stroke", "none")
     .style("opacity", 1.0)
     // define tooltip on mouseover
-    .on("mouseover", d => {
-      const { Time, Year, Name, Nationality, Doping } = d;
+    .on("mouseover", () => {
       toolTip
         .transition()
         .duration(200)
-        .style("opacity", 0.9);
+        .style("opacity", 0.8);
+    })
+    .on("mousemove", d => {
+      const { year, parsedMonth, variance } = d;
       toolTip
         .html(
-          `${Name}: ${Nationality}<br>Year: ${Year}, Time: ${Time}<br><br>${Doping}`
+          `${year} - ${parsedMonth}<br>${(
+            Math.round((baseTemp + variance) * 10) / 10
+          ).toFixed(1)}℃<br>${(Math.round(variance * 10) / 10).toFixed(1)}℃`
         )
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY - 28 + "px");
     })
-    .on("mouseout", d => {
+    .on("mouseout", () => {
       toolTip
         .transition()
         .duration(500)
