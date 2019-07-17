@@ -14,43 +14,73 @@ request.onload = () => {
   const w = 1000;
   const h = 450;
 
-  var parseYear = d3.timeParse("%Y");
+  const parseYear = d3.timeParse("%Y");
+  const parseMonth = d3.timeParse("%m");
+  const formatMonth = d3.timeFormat("%B");
 
   // format the data
   json.monthlyVariance.forEach(function(d, i) {
     d.parsedYear = parseYear(d.year);
+    d.parsedMonth = formatMonth(parseMonth(d.month));
   });
+
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
 
   // define x and y scales
   const xScale = d3
     .scaleTime()
-    .domain([d3.min(json, d => d.parseYear), d3.max(json, d => d.parseYear)])
+    .domain([
+      d3.min(json.monthlyVariance, d => d.parsedYear),
+      d3.max(json.monthlyVariance, d => d.parsedYear)
+    ])
     .range([0, w]);
 
   const yScale = d3
-    .scaleLinear()
-    .domain([d3.min(json, d => d.Seconds), d3.max(json, d => d.Seconds)])
-    .range([h, 0]);
+    .scaleOrdinal()
+    .domain(months)
+    .range(
+      months.map((month, index) => {
+        return h - (h / months.length) * index;
+      })
+    );
+
+  // const yScale = d3
+  //   .scaleLinear()
+  //   .domain([d3.min(json, d => d.Seconds), d3.max(json, d => d.Seconds)])
+  //   .range([h, 0]);
 
   // // define svg plot area
-  // let svg = d3
-  //   .select("main")
-  //   .append("svg")
-  //   .attr("width", w + margin + margin)
-  //   .attr("height", h + margin + margin)
-  //   .append("g")
-  //   .attr("transform", "translate(" + margin + "," + margin + ")")
-  //   .style("background-color", "blue");
+  let svg = d3
+    .select("main")
+    .append("svg")
+    .attr("width", w + margin + margin)
+    .attr("height", h + margin + margin)
+    .append("g")
+    .attr("transform", "translate(" + margin + "," + margin + ")");
+  // .style("background-color", "blue");
 
   // // add x-axis
-  // svg
-  //   .append("g")
-  //   .attr("transform", `translate(0, ${h})`)
-  //   .call(d3.axisBottom(xScale));
-  // // .tickFormat(d3.format("d"));
+  svg
+    .append("g")
+    .attr("transform", `translate(0, ${h})`)
+    .call(d3.axisBottom(xScale));
+  // .tickFormat(d3.format("d"));
 
   // // add y-axis
-  // svg.append("g").call(d3.axisLeft(yScale));
+  svg.append("g").call(d3.axisLeft(yScale));
 
   // // add y-axis label
   // svg
