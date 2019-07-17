@@ -1,0 +1,25 @@
+body {
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  min-height: 100vh;
+}
+main {
+  background-color: white;
+}
+
+.tooltip {
+  position: absolute;
+  width: auto;
+  height: auto;
+  padding: 5px;
+  font: 12px sans-serif;
+  background: grey;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
