@@ -24,6 +24,7 @@ request.onload = () => {
     d.parsedMonth = formatMonth(parseMonth(d.month));
   });
 
+  const baseTemp = json.baseTemperature;
   const data = json.monthlyVariance;
 
   const months = [
@@ -40,6 +41,52 @@ request.onload = () => {
     "November",
     "December"
   ];
+
+  const colorScale = [
+    "#0000c4",
+    "#3332c8",
+    "#6563cc",
+    "#9895d0",
+    "#cac6d3",
+    "#fdf8d7",
+    "#f0c6ac",
+    "#e39581",
+    "#d66356",
+    "#c9322b",
+    "#bc0000"
+  ];
+
+  console.log(0 < 2.8);
+
+  const getColor = temp => {
+    let color = "";
+    if (temp < 2.8) {
+      color = colorScale[0];
+    } else if (temp < 3.9) {
+      color = colorScale[1];
+    } else if (temp < 5.0) {
+      color = colorScale[2];
+    } else if (temp < 6.1) {
+      color = colorScale[3];
+    } else if (temp < 7.2) {
+      color = colorScale[4];
+    } else if (temp < 8.3) {
+      color = colorScale[5];
+    } else if (temp < 9.5) {
+      color = colorScale[6];
+    } else if (temp < 10.6) {
+      color = colorScale[7];
+    } else if (temp < 11.7) {
+      color = colorScale[8];
+    } else if (temp < 12.8) {
+      color = colorScale[9];
+    } else {
+      color = colorScale[10];
+    }
+    return color;
+  };
+
+  console.log(getColor(baseTemp + data[20].variance));
 
   // define x and y scales
   const xScale = d3
@@ -130,16 +177,14 @@ request.onload = () => {
     .attr("y", function(d) {
       return yScale(d.parsedMonth);
     })
-    .attr("rx", 4)
-    .attr("ry", 4)
+    .attr("rx", 1)
+    .attr("ry", 1)
     .attr("width", w / (d3.max(data, d => d.year) - d3.min(data, d => d.year)))
     .attr("height", h / 12)
-    // .style("fill", function(d) {
-    //   return myColor(d.value);
-    // })
+    .style("fill", d => getColor(baseTemp + d.variance))
     .style("stroke-width", 4)
     .style("stroke", "none")
-    .style("opacity", 0.8)
+    .style("opacity", 1.0)
     // define tooltip on mouseover
     .on("mouseover", d => {
       const { Time, Year, Name, Nationality, Doping } = d;
