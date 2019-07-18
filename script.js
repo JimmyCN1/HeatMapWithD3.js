@@ -8,8 +8,6 @@ request.send();
 request.onload = () => {
   json = JSON.parse(request.responseText);
 
-  console.log(json);
-
   const margin = 80;
   const w = 1000;
   const h = 450;
@@ -43,43 +41,43 @@ request.onload = () => {
   ];
 
   const colorScale = [
-    "#0000c4",
-    "#3332c8",
-    "#6563cc",
-    "#9895d0",
-    "#cac6d3",
-    "#fdf8d7",
-    "#f0c6ac",
-    "#e39581",
-    "#d66356",
-    "#c9322b",
-    "#bc0000"
+    [2.8, "#0000c4"],
+    [3.9, "#3332c8"],
+    [5.0, "#6563cc"],
+    [6.1, "#9895d0"],
+    [7.2, "#cac6d3"],
+    [8.3, "#fdf8d7"],
+    [9.5, "#f0c6ac"],
+    [10.6, "#e39581"],
+    [11.7, "#d66356"],
+    [12.8, "#c9322b"],
+    [12.9, "#bc0000"]
   ];
 
   const getColor = temp => {
     let color = "";
     if (temp < 2.8) {
-      color = colorScale[0];
+      color = colorScale[0][1];
     } else if (temp < 3.9) {
-      color = colorScale[1];
+      color = colorScale[1][1];
     } else if (temp < 5.0) {
-      color = colorScale[2];
+      color = colorScale[2][1];
     } else if (temp < 6.1) {
-      color = colorScale[3];
+      color = colorScale[3][1];
     } else if (temp < 7.2) {
-      color = colorScale[4];
+      color = colorScale[4][1];
     } else if (temp < 8.3) {
-      color = colorScale[5];
+      color = colorScale[5][1];
     } else if (temp < 9.5) {
-      color = colorScale[6];
+      color = colorScale[6][1];
     } else if (temp < 10.6) {
-      color = colorScale[7];
+      color = colorScale[7][1];
     } else if (temp < 11.7) {
-      color = colorScale[8];
+      color = colorScale[8][1];
     } else if (temp < 12.8) {
-      color = colorScale[9];
+      color = colorScale[9][1];
     } else {
-      color = colorScale[10];
+      color = colorScale[10][1];
     }
     return color;
   };
@@ -100,7 +98,7 @@ request.onload = () => {
     .select("main")
     .append("svg")
     .attr("width", w + margin + margin)
-    .attr("height", h + margin + margin)
+    .attr("height", h + margin + margin + margin)
     .append("g")
     .attr("transform", "translate(" + margin + "," + margin + ")");
 
@@ -123,6 +121,48 @@ request.onload = () => {
     .style("text-anchor", "middle")
     .text("Month");
 
+  // add legend color boxes
+  svg
+    // .select("main")
+    .selectAll("legendKey")
+    .data("colorScale")
+    .enter()
+    .append("rect")
+    .attr("x", (d, i) => {
+      return i * 40;
+    })
+    .attr("y", h + 40)
+    .attr("width", 40)
+    .attr("height", 40)
+    .style("fill", (d, i) => colorScale[i][1])
+    .style("stroke", "black");
+
+  // add legend lines under color box
+  svg
+    .selectAll("legendLine")
+    .data(colorScale)
+    .enter()
+    .append("line")
+    .attr("x1", (d, i) => i * 40)
+    .attr("x2", (d, i) => i * 40)
+    .attr("y1", h + 80)
+    .attr("y2", h + 90)
+    .style("stroke", (d, i) =>
+      i === 0 || i === colorScale.length - 1 ? "white" : "black"
+    );
+
+  // add temp values to legend
+  svg
+    .selectAll("legendValues")
+    .data(colorScale)
+    .enter()
+    .append("text")
+    .attr("x", (d, i) => i * 40 - 10)
+    .attr("y", h + 105)
+    .text((d, i) =>
+      i === 0 || i === colorScale.length - 1 ? "" : colorScale[i][0]
+    );
+
   // Define the div for the tooltip
   let toolTip = d3
     .select("main")
@@ -130,7 +170,7 @@ request.onload = () => {
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-  // add the squares
+  // add the rectangles
   svg
     .selectAll("rect")
     .data(data, function(d) {
@@ -144,8 +184,6 @@ request.onload = () => {
     .attr("y", function(d) {
       return yScale(d.parsedMonth);
     })
-    .attr("rx", 1)
-    .attr("ry", 1)
     .attr("width", w / (d3.max(data, d => d.year) - d3.min(data, d => d.year)))
     .attr("height", h / 12)
     .style("fill", d => getColor(baseTemp + d.variance))
@@ -176,36 +214,6 @@ request.onload = () => {
         .duration(500)
         .style("opacity", 0);
     });
-
-  // // Handmade legend
-  // svg
-  //   .append("rect")
-  //   .attr("x", w - 210)
-  //   .attr("y", 89)
-  //   .attr("width", 20)
-  //   .attr("height", 20)
-  //   .style("fill", "blue");
-  // svg
-  //   .append("rect")
-  //   .attr("x", w - 210)
-  //   .attr("y", 114)
-  //   .attr("width", 20)
-  //   .attr("height", 20)
-  //   .style("fill", "orange");
-  // svg
-  //   .append("text")
-  //   .attr("x", w - 185)
-  //   .attr("y", 100)
-  //   .text("Riders with Doping Allegations")
-  //   .style("font-size", "15px")
-  //   .attr("alignment-baseline", "middle");
-  // svg
-  //   .append("text")
-  //   .attr("x", w - 185)
-  //   .attr("y", 125)
-  //   .text("No Doping Allegations")
-  //   .style("font-size", "15px")
-  //   .attr("alignment-baseline", "middle");
 
   // add the plot title
   svg
